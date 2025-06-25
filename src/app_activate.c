@@ -14,7 +14,7 @@ typedef struct {
 void display_sizes(GtkWidget *win, gpointer display_box) {
     GtkWindow *winwin = GTK_WINDOW(win);
     Display *display = display_box;
-    widget_set_size_request_percent_window(winwin, display->navbar, 30, 100);
+    widget_set_size_request_percent_window(winwin, display->navbar, 20, 100);
 }
 
 void scaling(GtkWidget *win, gpointer display_box) {
@@ -24,7 +24,7 @@ void scaling(GtkWidget *win, gpointer display_box) {
 
     GdkRectangle geometry_actual, *geometry = &geometry_actual;
     int win_width, win_heigth;
-    double scale_factor;
+    // double scale_factor;
 
     display = gdk_display_get_default();
 
@@ -36,12 +36,11 @@ void scaling(GtkWidget *win, gpointer display_box) {
 
     gdk_monitor_get_geometry(monitor, geometry);
 
-    scale_factor = gdk_surface_get_scale(surface);
-    win_width = geometry->width * scale_factor * WINDOW_WIDTH_PERCENT / 100;
-    win_heigth = geometry->height * scale_factor * WINDOW_HEIGHT_PERCENT / 100;
+    // scale_factor = gdk_surface_get_scale(surface);
+    win_width = geometry->width * WINDOW_WIDTH_PERCENT / 100;
+    win_heigth = geometry->height * WINDOW_HEIGHT_PERCENT / 100;
 
-    gtk_window_set_default_size(GTK_WINDOW(win), win_width,
-                                win_heigth * scale_factor);
+    gtk_window_set_default_size(GTK_WINDOW(win), win_width, win_heigth);
 
     display_sizes(win, display_box);
 }

@@ -6,8 +6,6 @@
 
 // Define C equivalents of Rust types
 
-
-
 void print_room(Room *room) {
     printf("\t\tRoom %s for %s\n", room->name, room->price);
 }
@@ -26,7 +24,6 @@ void print_city(City *city) {
 void print_city_list(ListCCity *cities) {
     if (!cities)
         printf("city list nao existe\n");
-
     for (int i = 0; i < cities->len; i++) {
         print_city(&cities->cities[i]);
     }
