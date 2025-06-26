@@ -30,3 +30,15 @@ void free_widget_list(WidgetList *list) {
     free(list);
     list = NULL;
 }
+
+WidgetList *widget_list_new() {
+    WidgetList *list;
+    list = malloc(sizeof(WidgetList));
+    list->length = 0;
+    list->widgets = NULL;
+    return list;
+}
+
+void push_to_widget_list(WidgetList *list, GtkWidget *widget) {
+    list->widgets[list->length++] = widget;
+}

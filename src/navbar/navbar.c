@@ -8,7 +8,7 @@
 #include <gtk/gtkshortcut.h>
 #include <stdlib.h>
 
-GtkWidget *cities_box_maker(GtkWidget ***check_buttons) {
+GtkWidget *cities_box_maker(WidgetList **check_buttons) {
     GtkWidget *inner_box = NULL;
     GtkWidget *scrolled_window;
     StringList *cities = city_list();
@@ -18,9 +18,12 @@ GtkWidget *cities_box_maker(GtkWidget ***check_buttons) {
 
     inner_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 4);
 
+    *check_buttons = widget_list_new();
+
     for (int i = 0; i < cities->length; i++) {
         check_buttons_new[i] =
             gtk_check_button_new_with_label(cities->cities[i]);
+        push_to_widget_list(*check_buttons, check_buttons_new[i]);
         gtk_box_append(GTK_BOX(inner_box), check_buttons_new[i]);
     }
 
@@ -31,8 +34,6 @@ GtkWidget *cities_box_maker(GtkWidget ***check_buttons) {
 
     free_string_list(cities);
 
-    *check_buttons = check_buttons_new;
-
     return scrolled_window;
 }
 
@@ -40,6 +41,7 @@ static void submit_search(GtkWidget *button, gpointer data) {
     WidgetList *check_buttons = data;
     StringList *list = string_list_new();
     ListCString *c_string;
+
     if (!check_buttons) {
         g_print("check buttons is null");
         return;
@@ -65,7 +67,7 @@ GtkWidget *navbar_box_maker(GtkWindow *win) {
     GtkWidget *grid;
     GtkWidget *city_list_box;
     GtkWidget *submit_button;
-    GtkWidget **check_buttons = NULL;
+    WidgetList *check_buttons = NULL;
 
     grid = gtk_grid_new();
 

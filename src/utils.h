@@ -6,3 +6,5 @@ typedef struct {
     GtkWidget **widgets;
     int length;
 } WidgetList;
+WidgetList *widget_list_new();
+void push_to_widget_list(WidgetList *list, GtkWidget *widget);
