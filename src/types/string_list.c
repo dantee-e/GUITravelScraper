@@ -1,8 +1,9 @@
 #include "string_list.h"
+#include "src/rust_interface/rust_interface.h"
 #include <stdlib.h>
 #include <string.h>
 
-void push_to_string_list(StringList *list, char *string) {
+void push_to_string_list(StringList *list, const char *string) {
     char **city = &(list->cities[list->length++]);
 
     *city = malloc(strlen(string) + 1);
@@ -22,6 +23,26 @@ StringList *string_list_new() {
     list = malloc(sizeof(StringList));
     list->length = 0;
     return list;
+}
+
+ListCString *string_list_as_list_c_string(struct StringList *list) {
+    ListCString *c_list = malloc(sizeof(ListCString));
+    if (!c_list)
+        return NULL;
+
+    c_list->length = list->length;
+
+    c_list->strings = malloc(sizeof(char *) * list->length);
+    if (!c_list->strings) {
+        free(c_list);
+        return NULL;
+    }
+
+    for (int i = 0; i < list->length; ++i) {
+        c_list->strings[i] = list->cities[i];
+    }
+
+    return c_list;
 }
 
 StringList *city_list() {

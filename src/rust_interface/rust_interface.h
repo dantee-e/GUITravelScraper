@@ -35,6 +35,8 @@ typedef struct {
 extern ListCCity *get_many_cities(ListCString cities_names_c,
                                   const char *date_start, const char *date_end);
 extern void free_city_list(ListCCity *city);
-extern void free_string_list(ListCString *ptr);
+extern void
+free_list_c_string(ListCString *ptr); // TODO change this name in the rust lib
 
-#endif //GUITRAVELSCRAPER_RUST_INTERFACE_H
+void print_city_list(ListCCity *cities);
+#endif // GUITRAVELSCRAPER_RUST_INTERFACE_H

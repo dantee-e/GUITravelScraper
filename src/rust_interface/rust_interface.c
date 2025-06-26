@@ -1,8 +1,8 @@
+#include "rust_interface.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include "rust_interface.h"
 
 // Define C equivalents of Rust types
 
@@ -28,24 +28,17 @@ void print_city_list(ListCCity *cities) {
         print_city(&cities->cities[i]);
     }
 }
-
-
-int get_cities(
-        const char **cities,
-        const int num_cities,
-        const char *date_start,
-        const char *date_end
-) {
-//    const char *cities[] = {"Dresden", "Berlin"};
-//    int num_cities = 2;
-//    const char *date_start = "2025-07-01";
-//    const char *date_end = "2025-07-05";
+int get_cities(const char **cities, const int num_cities,
+               const char *date_start, const char *date_end) {
+    //    const char *cities[] = {"Dresden", "Berlin"};
+    //    int num_cities = 2;
+    //    const char *date_start = "2025-07-01";
+    //    const char *date_end = "2025-07-05";
 
     ListCString cities_names_c;
     cities_names_c.length = num_cities;
     cities_names_c.strings = (const char **)malloc(num_cities * sizeof(char *));
 
-    // Copy city names (ensure null-terminated strings)
     for (int i = 0; i < num_cities; i++) {
         cities_names_c.strings[i] = strdup(cities[i]);
         if (!cities_names_c.strings[i]) {
@@ -62,7 +55,6 @@ int get_cities(
     ListCCity *result = get_many_cities(cities_names_c, date_start, date_end);
 
     print_city_list(result);
-
 
     free_city_list(result);
 
