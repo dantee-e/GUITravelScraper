@@ -3,14 +3,14 @@
 
 struct StringList {
     int length;
-    char *cities[NUMBER_OF_CITIES];
+    int capacity;
+    char **cities;
 };
 typedef struct StringList StringList;
 
 void push_to_string_list(StringList *list, const char *string);
 
 void free_string_list(StringList *list);
-
 StringList *string_list_new();
 
 StringList *city_list();

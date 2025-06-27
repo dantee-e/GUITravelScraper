@@ -28,7 +28,7 @@ typedef struct {
 } ListCCity;
 
 typedef struct {
-    const char **strings;
+    char **strings;
     unsigned int length;
 } ListCString;
 

@@ -28,6 +28,7 @@ void print_city_list(ListCCity *cities) {
         print_city(&cities->cities[i]);
     }
 }
+
 int get_cities(const char **cities, const int num_cities,
                const char *date_start, const char *date_end) {
     //    const char *cities[] = {"Dresden", "Berlin"};
@@ -37,7 +38,7 @@ int get_cities(const char **cities, const int num_cities,
 
     ListCString cities_names_c;
     cities_names_c.length = num_cities;
-    cities_names_c.strings = (const char **)malloc(num_cities * sizeof(char *));
+    cities_names_c.strings = (char **)malloc(num_cities * sizeof(char *));
 
     for (int i = 0; i < num_cities; i++) {
         cities_names_c.strings[i] = strdup(cities[i]);

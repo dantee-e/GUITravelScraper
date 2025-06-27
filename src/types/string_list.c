@@ -3,26 +3,50 @@
 #include <stdlib.h>
 #include <string.h>
 
-void push_to_string_list(StringList *list, const char *string) {
-    char **city = &(list->cities[list->length++]);
+// void push_to_string_list(StringList *list, const char *string) {
+//     char **city = &(list->cities[list->length++]);
 
-    *city = malloc(strlen(string) + 1);
+//     *city = malloc(strlen(string) + 1);
 
-    strcpy(*city, string);
-}
-
-void free_string_list(StringList *list) {
-    for (int i = 0; i < list->length; i++)
-        free(list->cities[i]);
-
-    free(list);
-}
-
+//     strcpy(*city, string);
+// }
 StringList *string_list_new() {
     StringList *list;
     list = malloc(sizeof(StringList));
     list->length = 0;
+    list->capacity = 0;
+    list->cities = NULL;
     return list;
+}
+
+void push_to_string_list(StringList *list, const char *string) {
+    if (!list) {
+        list = malloc(sizeof(StringList));
+    }
+    if (list->capacity == 0) {
+        list->cities = malloc(sizeof(const char *) * 4);
+        list->capacity = 4;
+        list->length = 0;
+    }
+
+    if (list->length > list->capacity) {
+        list->cities =
+            realloc(list->cities, list->capacity * 2 * sizeof(const char *));
+        list->capacity *= 2;
+    }
+
+    list->cities[list->length] = malloc((strlen(string) + 1) * sizeof(char));
+    strcpy(list->cities[list->length], string);
+    list->length++;
+}
+
+void free_string_list(StringList *list) {
+    if (!list)
+        return;
+    for (int i = 0; i < list->length; i++)
+        free(list->cities[i]);
+    free(list->cities);
+    free(list);
 }
 
 ListCString *string_list_as_list_c_string(struct StringList *list) {
@@ -39,7 +63,8 @@ ListCString *string_list_as_list_c_string(struct StringList *list) {
     }
 
     for (int i = 0; i < list->length; ++i) {
-        c_list->strings[i] = list->cities[i];
+        c_list->strings[i] = malloc(strlen(list->cities[i]) * sizeof(char));
+        strcpy(c_list->strings[i], list->cities[i]);
     }
 
     return c_list;
