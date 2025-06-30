@@ -53,14 +53,16 @@ typedef struct {
     ListCString *c_string;
     char *date_start;
     char *date_end;
+    ListCCity *results;
+    bool is_ready;
 } GetManyCitiesArgs;
 
 void threaded_get_many_cities(void *data) {
     GetManyCitiesArgs *args = (GetManyCitiesArgs *)data;
 
-    ListCCity *cities =
+    args->results =
         get_many_cities(*args->c_string, args->date_start, args->date_end);
-    print_city_list(cities);
+    args->is_ready = true;
 }
 
 static void submit_search(GtkWidget *button, gpointer data) {
@@ -93,23 +95,31 @@ static void submit_search(GtkWidget *button, gpointer data) {
 
     c_string = string_list_as_list_c_string(list);
 
-    for (int i = 0; i < c_string->length; i++) {
-        g_print("city %d is %s", i, list->cities[i]);
-    }
     GetManyCitiesArgs *args = malloc(sizeof(GetManyCitiesArgs));
 
     args->c_string = c_string;
-    args->date_start = "30.06.2025";
-    args->date_end = "02.07.2025";
+    args->date_start = "30.07.2025";
+    args->date_end = "02.08.2025";
 
-    pthread_create(&get_cities_thread, NULL, (void *)get_many_cities,
+    // ListCCity *cities =
+    //     get_many_cities(*c_string, args->date_start, args->date_end);
+
+    // print_city_list(cities);
+
+    pthread_create(&get_cities_thread, NULL, (void *)threaded_get_many_cities,
                    (void *)args);
 }
 
+typedef struct {
+    WidgetList *check_buttons;
+    GtkEntry *date_start;
+    GtkEntry *date_end;
+} SubmitSearchParams;
 GtkWidget *navbar_box_maker(GtkWindow *win) {
     GtkWidget *grid;
     GtkWidget *city_list_box;
     GtkWidget *submit_button;
+    GtkWidget *date_start, *date_end;
     WidgetList *check_buttons = NULL;
 
     grid = gtk_grid_new();
@@ -120,11 +130,25 @@ GtkWidget *navbar_box_maker(GtkWindow *win) {
     }
 
     submit_button = gtk_button_new_with_label("Submit");
-    g_signal_connect(submit_button, "clicked", G_CALLBACK(submit_search),
-                     check_buttons);
+    date_start = gtk_entry_new();
+    date_end = gtk_entry_new();
+    gtk_entry_set_max_length(GTK_ENTRY(date_start), 10);
+    gtk_entry_set_max_length(GTK_ENTRY(date_end), 10);
+    gtk_entry_set_placeholder_text(GTK_ENTRY(date_start),
+                                   "Input date in the format DD.MM.YEAR");
+    gtk_entry_set_placeholder_text(GTK_ENTRY(date_end),
+                                   "Input date in the format DD.MM.YEAR");
 
-    gtk_grid_attach(GTK_GRID(grid), city_list_box, 0, 0, 1, 9);
-    gtk_grid_attach(GTK_GRID(grid), submit_button, 0, 10, 1, 1);
+    // Creating the struct to pass to the callback and binding the signal
+    SubmitSearchParams *search_params = malloc(sizeof(SubmitSearchParams));
+    search_params->check_buttons = check_buttons;
+    search_params->date_start = GTK_ENTRY(date_start);
+    search_params->date_end = GTK_ENTRY(date_end);
+
+    gtk_grid_attach(GTK_GRID(grid), city_list_box, 0, 0, 1, 18);
+    gtk_grid_attach(GTK_GRID(grid), date_start, 0, 19, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), date_end, 0, 20, 1, 1);
+    gtk_grid_attach(GTK_GRID(grid), submit_button, 0, 21, 1, 1);
     gtk_grid_set_row_homogeneous(GTK_GRID(grid), TRUE);
     gtk_grid_set_column_homogeneous(GTK_GRID(grid), TRUE);
 
