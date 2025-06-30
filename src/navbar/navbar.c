@@ -51,22 +51,31 @@ GtkWidget *cities_box_maker(WidgetList **check_buttons) {
 
 typedef struct {
     ListCString *c_string;
-    char *date_start;
-    char *date_end;
+    const char *date_start;
+    const char *date_end;
     ListCCity *results;
     bool is_ready;
 } GetManyCitiesArgs;
 
 void threaded_get_many_cities(void *data) {
-    GetManyCitiesArgs *args = (GetManyCitiesArgs *)data;
+    GetManyCitiesArgs *args = data;
 
     args->results =
         get_many_cities(*args->c_string, args->date_start, args->date_end);
     args->is_ready = true;
+
+    print_city_list(args->results);
 }
+typedef struct {
+    WidgetList *check_buttons;
+    GtkEntry *date_start;
+    GtkEntry *date_end;
+} SubmitSearchParams;
 
 static void submit_search(GtkWidget *button, gpointer data) {
-    WidgetList *check_buttons = data;
+    SubmitSearchParams *search_params = data;
+
+    WidgetList *check_buttons = search_params->check_buttons;
     StringList *list = string_list_new();
     ListCString *c_string;
     pthread_t get_cities_thread;
@@ -98,23 +107,15 @@ static void submit_search(GtkWidget *button, gpointer data) {
     GetManyCitiesArgs *args = malloc(sizeof(GetManyCitiesArgs));
 
     args->c_string = c_string;
-    args->date_start = "30.07.2025";
-    args->date_end = "02.08.2025";
-
-    // ListCCity *cities =
-    //     get_many_cities(*c_string, args->date_start, args->date_end);
-
-    // print_city_list(cities);
+    args->date_start =
+        gtk_editable_get_text(GTK_EDITABLE(search_params->date_start));
+    args->date_end =
+        gtk_editable_get_text(GTK_EDITABLE(search_params->date_end));
 
     pthread_create(&get_cities_thread, NULL, (void *)threaded_get_many_cities,
                    (void *)args);
 }
 
-typedef struct {
-    WidgetList *check_buttons;
-    GtkEntry *date_start;
-    GtkEntry *date_end;
-} SubmitSearchParams;
 GtkWidget *navbar_box_maker(GtkWindow *win) {
     GtkWidget *grid;
     GtkWidget *city_list_box;
@@ -144,6 +145,9 @@ GtkWidget *navbar_box_maker(GtkWindow *win) {
     search_params->check_buttons = check_buttons;
     search_params->date_start = GTK_ENTRY(date_start);
     search_params->date_end = GTK_ENTRY(date_end);
+
+    g_signal_connect(submit_button, "clicked", G_CALLBACK(submit_search),
+                     search_params);
 
     gtk_grid_attach(GTK_GRID(grid), city_list_box, 0, 0, 1, 18);
     gtk_grid_attach(GTK_GRID(grid), date_start, 0, 19, 1, 1);
